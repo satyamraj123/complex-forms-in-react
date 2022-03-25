@@ -1,16 +1,27 @@
-import react, { useState } from "react";
+import react, { useState, useEffect } from "react";
 
 const SimpleInput = (props) => {
   const [enteredName, setEnteredName] = useState("");
-  const [enteredNameTouched,setEnteredNameTouched]=useState(false);
-  const enteredNameIsValid=enteredName.trim()!=='';
-  const nameInputIsInvalid=!enteredNameIsValid&&enteredNameTouched;
+  const [enteredNameTouched, setEnteredNameTouched] = useState(false);
+  const [formIsValid, setFormIsValid] = useState(false);
+
+  const enteredNameIsValid = enteredName.trim() !== "";
+  const nameInputIsInvalid = !enteredNameIsValid && enteredNameTouched;
+  
+  useEffect(() => {
+    if (enteredNameIsValid) {
+      setFormIsValid(true);
+    } else {
+      setFormIsValid(false);
+    }
+  }, [enteredNameIsValid]);
+
   const nameInputChangeHandler = (event) => {
     setEnteredName(event.target.value);
   };
-  const nameInputBlurHandler=(event)=>{
+  const nameInputBlurHandler = (event) => {
     setEnteredNameTouched(true);
-  }
+  };
   const formSubmitHandler = (event) => {
     event.preventDefault();
     setEnteredNameTouched(true);
@@ -18,11 +29,13 @@ const SimpleInput = (props) => {
       return;
     }
     console.log(enteredName);
-    setEnteredName('');
+    setEnteredName("");
     setEnteredNameTouched(false);
   };
 
-  const nameInputClasses=!nameInputIsInvalid?'form-control':'form-control invalid';
+  const nameInputClasses = !nameInputIsInvalid
+    ? "form-control"
+    : "form-control invalid";
   return (
     <form onSubmit={formSubmitHandler}>
       <div className={nameInputClasses}>
@@ -34,10 +47,14 @@ const SimpleInput = (props) => {
           onBlur={nameInputBlurHandler}
           value={enteredName}
         />
-        {nameInputIsInvalid&&<p className="error-text">Name must not be empty</p>}
+        {nameInputIsInvalid && (
+          <p className="error-text">Name must not be empty</p>
+        )}
       </div>
       <div className="form-actions">
-        <button type="submit">Submit</button>
+        <button type="submit" disabled={!formIsValid}>
+          Submit
+        </button>
       </div>
     </form>
   );
